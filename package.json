@@ -17,7 +17,6 @@
     "jshint": "^2.8.0",
     "jshint-stylish": "^2.0.1",
     "mocha": "^2.2.4",
-    "normalize.css": "3.0.3",
     "run-sequence": "^1.0.2"
   },
   "engines": {
@@ -42,5 +41,9 @@
     "build": "gulp build",
     "test": "gulp archive && mocha --reporter spec --timeout 5000"
   },
-  "version": "5.2.0"
+  "version": "5.2.0",
+  "dependencies": {
+    "foundation-sites": "^6.1.1",
+    "gulp-sass": "^2.1.1"
+  }
 }

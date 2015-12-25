@@ -72,8 +72,7 @@ gulp.task('copy', [
     'copy:jquery',
     'copy:license',
     'copy:main.css',
-    'copy:misc',
-    'copy:normalize'
+    'copy:misc'
 ]);
 
 gulp.task('copy:.htaccess', function () {
@@ -105,8 +104,9 @@ gulp.task('copy:main.css', function () {
                     ' | ' + pkg.license.type + ' License' +
                     ' | ' + pkg.homepage + ' */\n\n';
 
-    return gulp.src(dirs.src + '/css/main.css')
-               .pipe(plugins.header(banner))
+    return gulp.src(dirs.src + '/scss/main.scss')
+        .pipe(plugins.header(banner))
+        .pipe(plugins.sass().on('error', plugins.sass.logError))
                .pipe(plugins.autoprefixer({
                    browsers: ['last 2 versions', 'ie >= 8', '> 1%'],
                    cascade: false
@@ -122,7 +122,8 @@ gulp.task('copy:misc', function () {
 
         // Exclude the following files
         // (other tasks will handle the copying of these files)
-        '!' + dirs.src + '/css/main.css',
+        '!' + dirs.src + '/scss/*',
+        '!' + dirs.src + '/scss',
         '!' + dirs.src + '/index.html'
 
     ], {
@@ -131,11 +132,6 @@ gulp.task('copy:misc', function () {
         dot: true
 
     }).pipe(gulp.dest(dirs.dist));
-});
-
-gulp.task('copy:normalize', function () {
-    return gulp.src('node_modules/normalize.css/normalize.css')
-               .pipe(gulp.dest(dirs.dist + '/css'));
 });
 
 gulp.task('lint:js', function () {
