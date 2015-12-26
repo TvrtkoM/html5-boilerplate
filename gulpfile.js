@@ -165,4 +165,8 @@ gulp.task('build', function (done) {
     done);
 });
 
+gulp.task('watch', function () {
+    gulp.watch(dirs.src + '/**/*', ['lint:js', 'copy']);
+});
+
 gulp.task('default', ['build']);
