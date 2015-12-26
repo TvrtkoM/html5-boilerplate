@@ -2,3 +2,5 @@ archive
 dist
 node_modules
 .idea
+src/css/
+

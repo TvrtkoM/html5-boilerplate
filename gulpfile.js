@@ -99,19 +99,8 @@ gulp.task('copy:license', function () {
 });
 
 gulp.task('copy:main.css', function () {
-
-    var banner = '/*! HTML5 Boilerplate v' + pkg.version +
-                    ' | ' + pkg.license.type + ' License' +
-                    ' | ' + pkg.homepage + ' */\n\n';
-
-    return gulp.src(dirs.src + '/scss/main.scss')
-        .pipe(plugins.header(banner))
-        .pipe(plugins.sass().on('error', plugins.sass.logError))
-               .pipe(plugins.autoprefixer({
-                   browsers: ['last 2 versions', 'ie >= 8', '> 1%'],
-                   cascade: false
-               }))
-               .pipe(gulp.dest(dirs.dist + '/css'));
+    return gulp.src(dirs.src + '/css/main.css')
+        .pipe(gulp.dest(dirs.dist + '/css'));
 });
 
 gulp.task('copy:misc', function () {
@@ -132,6 +121,16 @@ gulp.task('copy:misc', function () {
         dot: true
 
     }).pipe(gulp.dest(dirs.dist));
+});
+
+gulp.task('scss:dev', function() {
+    return gulp.src(dirs.src + '/scss/main.scss')
+        .pipe(plugins.sass().on('error', plugins.sass.logError))
+        .pipe(plugins.autoprefixer({
+            browsers: ['last 2 versions', 'ie >= 8', '> 1%'],
+            cascade: false
+        }))
+        .pipe(gulp.dest(dirs.src + '/css'));
 });
 
 gulp.task('lint:js', function () {
@@ -160,13 +159,13 @@ gulp.task('archive', function (done) {
 
 gulp.task('build', function (done) {
     runSequence(
-        ['clean', 'lint:js'],
+        ['clean', 'lint:js', 'scss:dev'],
         'copy',
     done);
 });
 
 gulp.task('watch', function () {
-    gulp.watch(dirs.src + '/**/*', ['lint:js', 'copy']);
+    gulp.watch(dirs.src + '/scss/main.scss', ['scss:dev']);
 });
 
 gulp.task('default', ['build']);
