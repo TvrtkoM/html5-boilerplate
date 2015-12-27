@@ -1,6 +1,5 @@
 {
   "devDependencies": {
-    "@alrra/travis-scripts": "^1.1.1",
     "apache-server-configs": "2.14.0",
     "archiver": "^0.20.0",
     "del": "^2.0.2",
@@ -16,7 +15,6 @@
     "jquery": "1.11.3",
     "jshint": "^2.8.0",
     "jshint-stylish": "^2.0.1",
-    "mocha": "^2.2.4",
     "run-sequence": "^1.0.2"
   },
   "engines": {
@@ -26,8 +24,7 @@
     "directories": {
       "archive": "archive",
       "dist": "dist",
-      "src": "src",
-      "test": "test"
+      "src": "src"
     }
   },
   "homepage": "https://html5boilerplate.com/",
@@ -35,11 +32,10 @@
     "type": "MIT",
     "url": "https://github.com/h5bp/html5-boilerplate/blob/master/LICENSE.txt"
   },
-  "name": "html5-boilerplate",
+  "name": "html5-boilerplate-foundation",
   "private": true,
   "scripts": {
-    "build": "gulp build",
-    "test": "gulp archive && mocha --reporter spec --timeout 5000"
+    "build": "gulp build"
   },
   "version": "5.2.0",
   "dependencies": {
