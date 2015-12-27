@@ -2,13 +2,68 @@
    Browser Upgrade Prompt
    ========================================================================== */
 .browserupgrade {
-    margin: 0.2em 0;
-    background: #ccc;
-    color: #000;
-    padding: 0.2em 0;
+  margin: 0.2em 0;
+  background: #ccc;
+  color: #000;
+  padding: 0.2em 0;
 }
 
 @import "../../node_modules/foundation-sites/scss/foundation";
 
 @include foundation-global-styles;
+@include foundation-label;
+@include foundation-float-classes;
+
+$grid-row-width: map-get($breakpoints, medium);
+
+.container {
+  background-color: $code-background;
+  @include breakpoint(small) {
+    @include vertical-center;
+  }
+  @include breakpoint(medium) {
+    @include absolute-center;
+    min-width: $grid-row-width;
+  }
+  @include grid-row(2, nest) {
+    .col {
+      @include breakpoint(small) {
+        @include grid-col(2);
+      }
+      @include breakpoint(medium) {
+        @include grid-col(1);
+        min-height: 8em;
+      }
+    }
+    .col.unavailable {
+      @include grid-col(2);
+      min-height: 0;
+      background: lighten($warning-color, 15%);
+      color: darken($alert-color, 30%);
+    }
+  }
+}
+
+.inner-container {
+  @include grid-row(6, nest) {
+    [class$=col] {
+      @include breakpoint(small) {
+        .info {
+          font-size: 0.9em;
+        }
+        @include grid-col(6);
+      }
+    }
+  }
+  h4 {
+    margin: 0.6em 0;
+  }
+  p {
+    margin: 0.4em 0;
+  }
+  .label {
+    cursor: pointer;
+    font-size: 0.7em;
+  }
+}
 

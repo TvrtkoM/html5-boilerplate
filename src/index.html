@@ -18,15 +18,26 @@
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
 
-<section class="container">
-  <div class="col">
+<section class="container" id="app">
+  <div class="col" v-for="item in items">
+    <section class="inner-container">
+      <div class="title-col">
+        <h4>{{ item.display_name }} <a v-if="item.stream" href="{{ item.url }}"><span class="label float-right">Online now!</span></a></h4>
+      </div>
+      <div class="info-col">
+        <p class="info">{{ item.status }}</p>
+      </div>
+    </section>
+  </div>
+  <div class="col unavailable" v-if="unavailable">
+    <p>Following channels have been closed: </p>
+    <ul>
+      <li v-for="c in unavailable">{{ c }}</li>
+    </ul>
   </div>
 </section>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/{{JQUERY_VERSION}}/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="js/vendor/jquery-{{JQUERY_VERSION}}.min.js"><\/script>')</script>
-<script src="js/plugins.js"></script>
-<script src="js/main.js"></script>
+<script src="js/bundle.js"></script>
 
 <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
 <script>

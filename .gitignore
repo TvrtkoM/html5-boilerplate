@@ -1,6 +1,8 @@
 archive
-dist
+dist/
 node_modules
 .idea
 src/css/
+src/js/*map
+src/js/bundle.js
 
