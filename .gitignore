@@ -3,5 +3,6 @@ dist/
 node_modules
 .idea
 src/css/
-src/js/vendor/foundation
+src/js/*map
+src/js/bundle.js
 

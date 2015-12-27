@@ -6,7 +6,6 @@
     "glob": "^6.0.1",
     "gulp": "^3.8.11",
     "gulp-autoprefixer": "^3.0.2",
-    "gulp-header": "^1.2.2",
     "gulp-jscs": "^3.0.1",
     "gulp-jshint": "^2.0.0",
     "gulp-load-plugins": "^1.1.0",
@@ -32,7 +31,7 @@
     "type": "MIT",
     "url": "https://github.com/h5bp/html5-boilerplate/blob/master/LICENSE.txt"
   },
-  "name": "html5-boilerplate-foundation",
+  "name": "boilerplate-foundation-browserify",
   "private": true,
   "scripts": {
     "build": "gulp build"
@@ -40,6 +39,7 @@
   "version": "5.2.0",
   "dependencies": {
     "foundation-sites": "^6.1.1",
+    "gulp-browserify": "^0.5.1",
     "gulp-sass": "^2.1.1"
   }
 }
