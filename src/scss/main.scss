@@ -10,5 +10,65 @@
 
 @import "../../node_modules/foundation-sites/scss/foundation";
 
-@include foundation-global-styles;
+$breakpoints: (
+  small: 0,
+  medium: 530px,
+  large: 900px,
+  xlarge: 1200px,
+  xxlarge: 1440px
+);
 
+@include foundation-global-styles;
+@include foundation-grid;
+@include foundation-float-classes;
+@include foundation-typography;
+
+body {
+  min-width: 350px;
+}
+
+.main-section {
+  margin-top: 1em;
+}
+
+.author {
+  font-size: 0.8em;
+  margin: 0;
+}
+
+// Column class for xlarge
+@include breakpoint(xlarge) {
+  .row > .xlarge-3.column {
+    @include grid-col(3 of 12);
+  }
+}
+
+.story-box {
+  background: #ddeeee;
+  border: 1px dashed #c4c4c4;
+  margin-bottom: 0.5em;
+  height: 305px;
+  @include grid-row(6, $width: 220px) {
+    [class$=-col] {
+      @include grid-col(6);
+    }
+  }
+  .title-col {
+    height: 53px;
+    margin-top: 5px;
+    h6 > a {
+      color: darken($anchor-color, 25%);
+      font-weight: bold;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  .avatar-col img {
+    width: 200px;
+    height: 200px;
+  }
+  .info-col {
+    font-size: 0.7em;
+  }
+}

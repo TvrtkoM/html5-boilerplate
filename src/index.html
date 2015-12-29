@@ -18,8 +18,30 @@
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 <![endif]-->
 
-<!-- Add your site or application content here -->
-<p>Hello world! This is HTML5 Boilerplate + foundation scs + browserify in action.</p>
+<section class="main-section" id="app">
+  <h3 class="text-center">FreeCodeCamp Stories</h3>
+  <div class="small-12 columns text-center">
+    <div class="row">
+      <div class="small-12 medium-6 large-4 xlarge-3 columns" v-for="story in stories">
+        <div class="story-box">
+          <div class="author-col">
+            <p class="author text-left">by <a href="http://www.freecodecamp.com/{{ story.author.username }}">{{ story.author.username }}</a></p>
+          </div>
+          <div class="avatar-col">
+            <img src="{{ story.author.picture }}">
+          </div>
+          <div class="title-col">
+            <h6><a href="{{ story.link }}">{{ story.headline | shorten }}</a></h6>
+          </div>
+          <div class="info-col">
+            <span class="float-left">upvotes: {{ story.upVotes | num }}</span>
+            <span class="float-right">published: {{ story.timePosted | from_ts }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <script src="js/bundle.js"></script>
 
