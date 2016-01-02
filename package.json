@@ -14,7 +14,8 @@
     "jquery": "1.11.3",
     "jshint": "^2.8.0",
     "jshint-stylish": "^2.0.1",
-    "run-sequence": "^1.0.2"
+    "run-sequence": "^1.0.2",
+    "vue": "^1.0.13"
   },
   "engines": {
     "node": ">=0.10.0"

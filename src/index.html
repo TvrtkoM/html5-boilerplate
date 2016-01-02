@@ -14,12 +14,31 @@
     <script src="js/vendor/modernizr-2.8.3.min.js"></script>
 </head>
 <body>
-<!--[if lt IE 8]>
-<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-<![endif]-->
 
-<!-- Add your site or application content here -->
-<p>Hello world! This is HTML5 Boilerplate + foundation scs + browserify in action.</p>
+<form id="app">
+  <div class="row column">
+    <div class="input-group">
+      <input class="input-group-field" type="text" placeholder="Search wikipedia" v-model="query_str" @keyup="autocomplete">
+      <div class="input-group-button">
+        <input @click="search" type="submit" class="button" value="Search">
+      </div>
+    </div>
+    <div class="row column dd">
+      <div v-for="ac_item in ac_list">
+        <a @click="use_for_query">{{ ac_item.title }}</a>
+      </div>
+    </div>
+  </div>
+  <div class="row column" v-for="result in results">
+    <h4><a href="https://en.wikipedia.org/?curid={{ result.pageid }}">{{ result.title }}</a></h4>
+    <p>
+      {{ result.extract }}
+    </p>
+  </div>
+</form>
+<div class="row column text-center">
+  <a href="https://en.wikipedia.org/wiki/special:random" class="button random">Random wiki page</a>
+</div>
 
 <script src="js/bundle.js"></script>
 

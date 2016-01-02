@@ -1,14 +1,50 @@
-/* ==========================================================================
-   Browser Upgrade Prompt
-   ========================================================================== */
-.browserupgrade {
-    margin: 0.2em 0;
-    background: #ccc;
-    color: #000;
-    padding: 0.2em 0;
-}
-
 @import "../../node_modules/foundation-sites/scss/foundation";
 
-@include foundation-global-styles;
+$grid-row-width: 768px;
 
+@include foundation-global-styles;
+@include foundation-typography;
+@include foundation-grid;
+@include foundation-button;
+@include foundation-forms;
+
+body {
+  min-width: 768px;
+}
+
+.input-group {
+  margin-bottom: 0;
+}
+
+.input-group-button .button {
+  font-size: 0.89rem!important;
+}
+
+.dd {
+  & > div {
+    border: 0 solid #cacaca;
+    border-bottom-width: 1px;
+  }
+  border: 1px solid #cacaca;
+  border-top: 0;
+  border-bottom: 0;
+  position: absolute;
+  width: 738px;
+}
+.dd a {
+  font-size: 0.8em;
+  padding: 0.4em 0.6em;
+  margin: 0;
+  background: lighten(#D2E0E6, 10%);
+  display: block;
+  color: $secondary-color;
+  &:hover {
+    color: darken($secondary-color, 10%);
+  }
+}
+h4 {
+  margin-top: 10px;
+}
+.button.random {
+  margin: 10px 0;
+}
