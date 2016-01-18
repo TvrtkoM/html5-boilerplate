@@ -12,7 +12,7 @@ var plugins = require('gulp-load-plugins')();
 var runSequence = require('run-sequence');
 
 var pkg = require('./package.json');
-var dirs = pkg['h5bp-configs'].directories;
+var dirs = pkg['configs'].directories;
 
 // ---------------------------------------------------------------------
 // | Helper tasks                                                      |
@@ -24,7 +24,7 @@ gulp.task('archive:create_archive_dir', function () {
 
 gulp.task('archive:zip', function (done) {
 
-    var archiveName = path.resolve(dirs.archive, pkg.name + '_v' + pkg.version + '.zip');
+    var archiveName = path.resolve(dirs.archive, pkg.name + '.zip');
     var archiver = require('archiver')('zip');
     var files = require('glob').sync('**/*.*', {
         'cwd': dirs.dist,
@@ -148,18 +148,6 @@ gulp.task('scss:dev', function() {
         .pipe(gulp.dest(dirs.src + '/css'));
 });
 
-gulp.task('lint:js', function () {
-    return gulp.src([
-        'gulpfile.js',
-        dirs.src + '/js/*.js',
-        '!' + dirs.src + '/js/bundle.js',
-        dirs.test + '/*.js'
-    ]).pipe(plugins.jscs())
-      .pipe(plugins.jshint({jquery: false}))
-      .pipe(plugins.jshint.reporter('jshint-stylish'));
-});
-
-
 // ---------------------------------------------------------------------
 // | Main tasks                                                        |
 // ---------------------------------------------------------------------
@@ -175,7 +163,6 @@ gulp.task('archive', function (done) {
 gulp.task('build', function (done) {
     runSequence(
         'clean',
-        'lint:js',
         'bundle:dist',
         'copy',
     done);
