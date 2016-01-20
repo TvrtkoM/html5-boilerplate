@@ -1,14 +1,61 @@
-/* ==========================================================================
-   Browser Upgrade Prompt
-   ========================================================================== */
-.browserupgrade {
-    margin: 0.2em 0;
-    background: #ccc;
-    color: #000;
-    padding: 0.2em 0;
-}
-
 @import "../../node_modules/foundation-sites/scss/foundation";
 
 @include foundation-global-styles;
+@include foundation-grid;
+@include foundation-typography;
 
+$board-dim: 500px;
+$grid-row-width: $board-dim;
+
+@include foundation-button;
+@include foundation-button-group;
+
+.box {
+  height: 502px;
+  width: 500px;
+  margin: 0 auto;
+}
+
+#message {
+  float: right;
+}
+
+#board {
+  min-width: $board-dim;
+  margin-top: 10px;
+  position: relative;
+  .cell:not(:last-child) {
+    border-right: 1px solid black;
+  }
+  .row:not(:nth-last-child(2)) {
+    border-bottom: 1px solid black;
+  }
+}
+#boardOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: black;
+  color: white;
+  font-size: 2em;
+  > div {
+    @include absolute-center;
+  }
+}
+
+.row {
+  @include grid-row;
+}
+.cell {
+  @include grid-column(4);
+  position: relative;
+  height: $board-dim / 3;
+  svg {
+    @include absolute-center;
+    width: 100px;
+    height: 100px;
+  }
+}
+.buttons {
+  margin-top: 10px;
+}
