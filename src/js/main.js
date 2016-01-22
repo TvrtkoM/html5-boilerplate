@@ -13,6 +13,7 @@ $(document).ready(function() {
     $boardOverlay = $('#boardOverlay'),
     $message = $('#message'),
     checkWin = function(comb) {
+      // checks victory condition - comb is containing all elements from one of arrays in wins
       var wins = [
         [11, 12, 13],
         [21, 22, 23],
@@ -33,6 +34,7 @@ $(document).ready(function() {
       return result;
     },
     getMessage = function(game) {
+      // returns message depending on game state
       if(!game || !game.state) {
         return 'Game not started yet.';
       }
@@ -51,6 +53,7 @@ $(document).ready(function() {
   $message.text(getMessage());
 
   $('.cell').click(function(e) {
+    // cell clicking event handler
     var game = $board.data('game'),
       moves;
     if($(this).children().length == 0 && !game.win) {
@@ -79,8 +82,8 @@ $(document).ready(function() {
       state: 1, // 0 - not started; 1 - game in progress; 2 - game end
       next: 'x', // next/current move - 'x' or 'o'
       player: pick, // what player picked
-      move: 0,
-      win: null
+      move: 0, // move number
+      win: null // set to 'x' or 'o' on victory
     };
     $board
       .data('game', game)
@@ -89,7 +92,7 @@ $(document).ready(function() {
       .trigger('gEndTurn', [game]);
   });
 
-  // run on game state change
+  // run on game state change - turn ends
   $board.on('gEndTurn', function(e, game) {
     $message.text(getMessage(game));
   });
