@@ -14,6 +14,11 @@ $(document).ready(function() {
     $board = $('#board'),
     $boardOverlay = $('#boardOverlay'),
     $message = $('#message'),
+    initial_cells = [11, 12, 13, 21, 22, 23, 31, 32, 33],
+    removeMove = function(move, cells) {
+      cells.splice(cells.indexOf(move), 1);
+      return cells;
+    },
     checkWin = function(comb) {
       // checks victory condition - comb is containing all elements from one of arrays in wins
       var wins = [
@@ -50,20 +55,44 @@ $(document).ready(function() {
         return 'Game finished! It\'s draw.';
       }
     },
-    calculate_ai_move = function(player, x_moves, y_moves) {
+    _getMoveScore = function(player, move, moves, cells) {
+    },
+    calculateAiMove = function(player, moves, cells) {
+      var result,
+        next_move = cells[0],
+        moves_c = [].concat(moves),
+        player_moves = moves_c[player],
+        cells_rest = [].concat(cells),
+        move_score = cells.length - 10 // assuming worst case
+      ;
+      player_moves.push(next_move);
+      if(checkWin(player_moves)) {
+        return next_move;
+      }
+      $.each(cells_rest, function(idx, val) {
+        var next_move_score = _getMoveScore(player, val, moves_c, cells_rest);
+        if(next_move_score < move_score) {
+          move_score = next_move_score;
+          result = val;
+        }
+      });
+      return result;
     }
     ;
 
   $message.text(getMessage());
 
+  // cell clicking event handler
   $('.cell').click(function(e) {
-    // cell clicking event handler
     var game = $board.data('game'),
-      moves;
+      move, moves, cells;
+    // only if it's human turn
     if(game.player == game.next && $(this).children().length == 0 && !game.win) {
-      moves = $board.data(game.next);
+      move = parseInt($(this).data('cell'));
+      moves = $board.data('moves')[game.next];
+      cells = $board.data('cells');
+      removeMove(move, cells);
       moves.push($(this).data('cell'));
-      $board.data(game.next, moves);
       $(this).html(svg[game.next].clone());
       if(checkWin(moves)) {
         game.win = game.next;
@@ -77,6 +106,8 @@ $(document).ready(function() {
     }
   });
 
+  // handle clicking on select symbol / first player
+  // initializes game by adding data to $board
   $('.button.o, .button.x').click(function(e) {
     var $el = $(e.target), pick, game;
     e.preventDefault();
@@ -91,9 +122,9 @@ $(document).ready(function() {
     };
     $board
       .data('game', game)
-      .data('x' ,[])
-      .data('o', [])
-      .trigger('gEndTurn', [game]);
+      .data('moves', {'x': [], 'o': []})
+      .trigger('gEndTurn', [game])
+      .data('cells', initial_cells)
   });
 
   // run on game state change - turn ends
@@ -106,13 +137,12 @@ $(document).ready(function() {
 
   // AI move
   $board.on('gAIMove', function(e, game) {
-    var move = calculate_ai_move(game.next, $board.data('x'), $board.data('y'));
-    $("[data-cell==" + move + "]").html(svg[game.next].clone());
+    var move = calculateAiMove(game.next, $board.data('moves'), $board.data('cells'));
+    // $("[data-cell==" + move + "]").html(svg[game.next].clone());
   });
 
   // clears board - restarts game
   $('#restart').click(function() {
-    $board.data('game', null);
     $('.cell').html('');
     $message.text(getMessage());
     $boardOverlay.show();
