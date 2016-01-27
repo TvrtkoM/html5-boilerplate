@@ -14,6 +14,8 @@ var runSequence = require('run-sequence');
 var pkg = require('./package.json');
 var dirs = pkg['configs'].directories;
 
+var karma = require('karma');
+
 // ---------------------------------------------------------------------
 // | Helper tasks                                                      |
 // ---------------------------------------------------------------------
@@ -166,6 +168,12 @@ gulp.task('build', function (done) {
         'bundle:dist',
         'copy',
     done);
+});
+
+gulp.task('test', function(done) {
+    new karma.Server({
+        configFile: __dirname + '/karma.conf.js'
+    }, done).start();
 });
 
 gulp.task('watch', function () {

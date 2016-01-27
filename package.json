@@ -2,6 +2,7 @@
   "devDependencies": {
     "apache-server-configs": "2.14.0",
     "archiver": "^0.21.0",
+    "browserify": "^13.0.0",
     "del": "^2.0.2",
     "foundation-sites": "^6.1.1",
     "glob": "^6.0.1",
@@ -13,8 +14,14 @@
     "gulp-replace": "^0.5.3",
     "gulp-sass": "^2.1.1",
     "jquery": "^2.2.0",
+    "karma": "^0.13.19",
+    "karma-browserify": "^5.0.1",
+    "karma-firefox-launcher": "^0.1.7",
+    "karma-qunit": "^0.1.9",
     "modernizr": "^3.3.1",
-    "run-sequence": "^1.0.2"
+    "qunitjs": "^1.20.0",
+    "run-sequence": "^1.0.2",
+    "watchify": "^3.7.0"
   },
   "engines": {
     "node": ">=0.10.0"
