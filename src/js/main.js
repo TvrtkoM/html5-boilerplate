@@ -55,25 +55,43 @@ $(document).ready(function() {
         return 'Game finished! It\'s draw.';
       }
     },
-    _getMoveScore = function(player, move, moves, cells) {
+    _calcMoveScore_helper = function(player, moves, cells, iter) {
+      var moves_c = $.extend(true, {}, moves),
+        cells_c = [].concat(cells),
+        player_moves = moves_c[player],
+        scores = [], res
+      ;
+      if(cells.length == 1) {
+        player_moves.push(cells[0]);
+        player_moves.sort();
+        return checkWin(player_moves) ? 11: 0;
+      }
+      else {
+        $.each(cells, function(idx, val) {
+          player_moves.push(val);
+          player_moves.sort();
+          if(checkWin(player_moves)) {
+            scores.push(iter + (iter % 2 == 0 ? 10: -10));
+          } else {
+            scores.push(_calcMoveScore_helper(
+              player == 'x' ? 'o' : 'x',
+              moves_c,
+              removeMove(cells[0], cells_c),
+              iter+1))
+          }
+        });
+      }
+      res = Math.max.apply(null, scores);
+      console.log(scores);
+      return res;
     },
     calculateAiMove = function(player, moves, cells) {
-      var result,
-        next_move = cells[0],
-        moves_c = [].concat(moves),
-        player_moves = moves_c[player],
-        cells_rest = [].concat(cells),
-        move_score = cells.length - 10 // assuming worst case
-      ;
-      player_moves.push(next_move);
-      if(checkWin(player_moves)) {
-        return next_move;
-      }
-      $.each(cells_rest, function(idx, val) {
-        var next_move_score = _getMoveScore(player, val, moves_c, cells_rest);
-        if(next_move_score < move_score) {
-          move_score = next_move_score;
+      var prev_score = 0, result = cells[0];
+      $.each(cells, function(idx, val) {
+        var move_score = _calcMoveScore_helper(player, moves, cells, 0);
+        if(prev_score < move_score) {
           result = val;
+          prev_score = move_score;
         }
       });
       return result;
@@ -93,6 +111,7 @@ $(document).ready(function() {
       cells = $board.data('cells');
       removeMove(move, cells);
       moves.push($(this).data('cell'));
+      moves.sort();
       $(this).html(svg[game.next].clone());
       if(checkWin(moves)) {
         game.win = game.next;
@@ -122,9 +141,10 @@ $(document).ready(function() {
     };
     $board
       .data('game', game)
-      .data('moves', {'x': [], 'o': []})
-      .trigger('gEndTurn', [game])
-      .data('cells', initial_cells)
+      .data('moves', { 'x': [], 'o': [] })
+      .data('cells', [].concat(initial_cells))
+      .trigger('gEndTurn', [game]);
+    console.log($board.data());
   });
 
   // run on game state change - turn ends
@@ -137,8 +157,16 @@ $(document).ready(function() {
 
   // AI move
   $board.on('gAIMove', function(e, game) {
-    var move = calculateAiMove(game.next, $board.data('moves'), $board.data('cells'));
-    // $("[data-cell==" + move + "]").html(svg[game.next].clone());
+    var cells = $board.data('cells'),
+      moves = $board.data('moves'),
+      move = calculateAiMove(game.next, moves, cells)
+      ;
+    $('.cell[data-cell=' + move + ']').html(svg[game.next].clone());
+    moves[game.next].push(move);
+    moves[game.next].sort();
+    game.next = game.next == 'x' ? 'o' : 'x';
+    removeMove(move, cells);
+    $board.trigger('gEndTurn', [game]);
   });
 
   // clears board - restarts game
