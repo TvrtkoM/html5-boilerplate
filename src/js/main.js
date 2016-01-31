@@ -149,7 +149,7 @@ $(document).ready(function() {
     $boardOverlay.hide();
     game = {
       state: 1, // 0 - not started; 1 - game in progress; 2 - game end
-      next: pick == 'x' ? 'o': 'x', // next/current move - 'x' or 'o'
+      next: 'x', // next/current move - 'x' or 'o'
       player: pick, // what player picked
       move: 0, // move number
       win: null // set to 'x' or 'o' on victory
