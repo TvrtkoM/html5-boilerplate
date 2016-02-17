@@ -1,4 +1,1 @@
-module.exports = function() {
-  return 42;
-};
-
+var angular = require('angular');

@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "angular": "^1.5.0",
     "apache-server-configs": "2.14.0",
     "archiver": "^0.21.0",
     "browserify": "^13.0.0",

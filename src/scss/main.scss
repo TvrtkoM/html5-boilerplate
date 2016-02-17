@@ -8,7 +8,46 @@
     padding: 0.2em 0;
 }
 
+$grid-row-width: 450px;
+$btn-size: $grid-row-width/2;
+
 @import "../../node_modules/foundation-sites/scss/foundation";
 
 @include foundation-global-styles;
 
+.iface {
+  @include absolute-center;
+}
+
+.iface-row {
+  .green { background-color: green; }
+  .red { background-color: red; }
+  .yellow { background-color: yellow; }
+  .blue { background-color: blue; }
+  @include grid-row(2, collapse) {
+    .iface-btn {
+      @include grid-column(1);
+      width: $btn-size;
+      height: $btn-size;
+      border: 3px solid black;
+    }
+  }
+
+  &:first-child {
+    .iface-btn {
+      border-radius: 0 $btn-size 0 0;
+    }
+    .iface-btn:first-child {
+      border-radius: $btn-size 0 0 0;
+    }
+  }
+
+  &:last-child {
+    .iface-btn {
+      border-radius: 0 0 $btn-size 0;
+    }
+    .iface-btn:first-child {
+      border-radius: 0 0 0 $btn-size;
+    }
+  }
+}
