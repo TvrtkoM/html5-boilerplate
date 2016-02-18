@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js" lang="">
+<html class="no-js" lang="" ng-app="simonGame">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -12,7 +12,7 @@
 
     <link rel="stylesheet" href="css/main.css">
 </head>
-<body>
+<body ng-controller="game">
 
 <div class="iface">
   <div class="iface-row">
@@ -34,17 +34,12 @@
       </div>
     </div>
     <div class="iface-control">
-      <span>START</span>
-      <div class="switch tiny">
-        <input class="switch-input" id="startSwitch" type="checkbox" name="exampleSwitch">
-        <label class="switch-paddle" for="startSwitch">
-        </label>
-      </div>
+      <button ng-class="{disabled : !isOn}" ng-click="game.restart()"><span ng-show="game.hasStarted">RE</span>START</button>
     </div>
     <div class="iface-control">
       <span>STRICT</span>
       <div class="switch tiny">
-        <input class="switch-input" id="strictSwitch" type="checkbox" name="exampleSwitch">
+        <input class="switch-input" id="strictSwitch" type="checkbox" name="isStrict">
         <label class="switch-paddle" for="strictSwitch">
         </label>
       </div>
@@ -52,7 +47,7 @@
     <div class="iface-control full">
       <span>OFF / ON</span>
       <div class="switch">
-        <input class="switch-input" id="onOffSwitch" type="checkbox" name="exampleSwitch">
+        <input class="switch-input" id="onOffSwitch" type="checkbox" name="isOn" ng-model="isOn">
         <label class="switch-paddle" for="onOffSwitch">
         </label>
       </div>
@@ -60,8 +55,7 @@
   </div>
 </div>
 
-
-<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+<script src="lib/jquery.min.js"></script>
 <script src="js/bundle.js"></script>
 </body>
 </html>
