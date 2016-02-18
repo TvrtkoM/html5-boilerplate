@@ -1,53 +1,108 @@
-/* ==========================================================================
-   Browser Upgrade Prompt
-   ========================================================================== */
-.browserupgrade {
-    margin: 0.2em 0;
-    background: #ccc;
-    color: #000;
-    padding: 0.2em 0;
-}
+@import url(https://fonts.googleapis.com/css?family=Anton);
 
 $grid-row-width: 450px;
 $btn-size: $grid-row-width/2;
+$border-default: 10px solid black;
 
 @import "../../node_modules/foundation-sites/scss/foundation";
 
 @include foundation-global-styles;
+@include foundation-button;
+@include foundation-switch;
+
+body {
+}
+
+.green { background-color: darken(green, 10%); }
+.red { background-color: darken(red, 10%); }
+.yellow { background-color: darken(yellow, 10%); }
+.blue { background-color: darken(blue, 10%); }
+
+.green.active { background-color: green; }
+.red.active { background-color: red; }
+.yellow.active { background-color: yellow; }
+.blue.active { background-color: blue; }
 
 .iface {
   @include absolute-center;
+  box-shadow: 0 0 12px #222;
+  border-radius: 100%;
+  min-width: $grid-row-width;
 }
 
 .iface-row {
-  .green { background-color: green; }
-  .red { background-color: red; }
-  .yellow { background-color: yellow; }
-  .blue { background-color: blue; }
   @include grid-row(2, collapse) {
     .iface-btn {
       @include grid-column(1);
       width: $btn-size;
       height: $btn-size;
-      border: 3px solid black;
     }
   }
 
+  .iface-btn {
+    border-right: $border-default;
+    border-left: $border-default;
+  }
+
   &:first-child {
+    border-bottom: $border-default;
     .iface-btn {
-      border-radius: 0 $btn-size 0 0;
+      border-top: $border-default;
     }
     .iface-btn:first-child {
-      border-radius: $btn-size 0 0 0;
+      border-radius: 100% 0 0 0;
+    }
+    .iface-btn:last-child {
+      border-radius: 0 100% 0 0;
     }
   }
 
   &:last-child {
     .iface-btn {
-      border-radius: 0 0 $btn-size 0;
+      border-bottom: $border-default;
     }
+    border-top: $border-default;
     .iface-btn:first-child {
-      border-radius: 0 0 0 $btn-size;
+      border-radius: 0 0 0 100%;
+    }
+    .iface-btn:last-child {
+      border-radius: 0 0 100% 0;
     }
   }
+}
+
+.iface-controls {
+  text-align: center;
+  @include absolute-center;
+  width: $btn-size;
+  height: $btn-size;
+  background: white;
+  border-radius: 100%;
+  border: $border-default;
+  padding-top: 1.3rem;
+  h2 {
+    font-family: 'Anton', sans-serif;
+    font-size: 2.5rem;
+    margin: 0;
+  }
+}
+
+.iface-controls-row {
+  .switch-paddle { margin: 0 auto; }
+  @include grid-row(3, collapse) {
+    .iface-control {
+      @include grid-column(1, 0);
+      font-size: 0.6rem;
+    }
+    .iface-control.full {
+      @include grid-column(3, 0);
+    }
+  }
+}
+
+.iface-control .counter code {
+  line-height: 24px;
+  height: 24px;
+  font-size: 20px;
+  border: 1px solid $light-gray;
 }
