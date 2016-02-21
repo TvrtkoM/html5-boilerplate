@@ -13,21 +13,29 @@ $button-margin: 0;
 @include foundation-button;
 @include foundation-switch;
 
-.green { background-color: darken(green, 10%); }
-.red { background-color: darken(red, 10%); }
-.yellow { background-color: darken(yellow, 10%); }
-.blue { background-color: darken(blue, 10%); }
+$green: #3c9204;
+$red: #e33600;
+$yellow: #eecc00;
+$blue: #0061f0;
 
-.green.active { background-color: green; }
-.red.active { background-color: red; }
-.yellow.active { background-color: yellow; }
-.blue.active { background-color: blue; }
+.green { background-color: darken($green, 15%); }
+.red { background-color: darken($red, 15%); }
+.yellow { background-color: darken($yellow, 15%); }
+.blue { background-color: darken($blue, 15%); }
+
+.green.active { background-color: $green; }
+.red.active { background-color: $red; }
+.yellow.active { background-color: $yellow; }
+.blue.active { background-color: $blue; }
 
 .iface {
   @include absolute-center;
   box-shadow: 0 0 12px #222;
   border-radius: 100%;
   min-width: $grid-row-width;
+  &.enabled .iface-btn {
+    cursor: pointer;
+  }
 }
 
 .iface-row {
@@ -40,6 +48,7 @@ $button-margin: 0;
   }
 
   .iface-btn {
+    cursor: not-allowed;
     border-right: $border-default;
     border-left: $border-default;
   }
