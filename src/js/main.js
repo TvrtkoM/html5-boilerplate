@@ -32,9 +32,8 @@ simonGame.factory('gameStateFactory', [
 
 simonGame.controller('game', [
   '$scope',
-  '$rootScope',
   'gameStateFactory',
-  function($scope, $rootScope, gameStateFactory) {
+  function($scope, gameStateFactory) {
     $scope.game = gameStateFactory.new();
 
     $scope.$watch('isOn', function(val) {
@@ -44,7 +43,7 @@ simonGame.controller('game', [
     });
     $scope.$watch('game.steps', function(newVal, oldVal) {
       if(newVal.length > 0) {
-        $rootScope.$broadcast('game:showSteps', newVal);
+        $scope.$broadcast('game:showSteps', newVal);
       }
     });
   }
@@ -53,8 +52,7 @@ simonGame.controller('game', [
 simonGame.directive('sgButtons', [
   '$q',
   '$interval',
-  '$rootScope',
-  function($q, $interval, $rootScope) {
+  function($q, $interval) {
     return {
       template: '\
       <div class="iface" ng-class="{enabled: current == -1}">\
@@ -71,23 +69,21 @@ simonGame.directive('sgButtons', [
       scope: {
         steps: '=steps'
       },
-      link: function($scope, $el, attrs) {
-        var buttons = $el.find('.iface-btn'),
-          user_steps = [];
+      controller: function($scope) {
         var runSteps = function(steps) {
           var seq = $q.defer(),
             interval = $interval(function() {
-            if(steps.length == 0) {
-              seq.resolve();
-              $interval.cancel(interval);
-            } else {
-              seq.notify(steps.shift() + 1);
-            }
-          }, 1000);
+              if(steps.length == 0) {
+                seq.resolve();
+                $interval.cancel(interval);
+              } else {
+                seq.notify(steps.shift() + 1);
+              }
+            }, 1000);
           return seq.promise;
         };
         $scope.current = -2;
-        $rootScope.$on('game:showSteps', function(event, steps) {
+        $scope.$on('game:showSteps', function(event, steps) {
           $scope.current = 0;
           $scope.steps = steps;
           runSteps([].concat(steps)).then(function(res) {
@@ -97,6 +93,10 @@ simonGame.directive('sgButtons', [
             $scope.current = curr;
           });
         });
+      },
+      link: function($scope, $el, attrs) {
+        var buttons = $el.find('.iface-btn'),
+          play_steps = [];
       }
     }
   }
