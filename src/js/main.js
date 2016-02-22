@@ -1,15 +1,30 @@
 var angular = require('angular');
-
 var simonGame = angular.module('simonGame', []);
+
+simonGame.filter('twoDigit', [
+  function() {
+    return function(input) {
+      if(input == 0) {
+        return '--';
+      }
+      else if (input < 10) {
+        return '0' + input.toString();
+      }
+      return input.toString();
+    }
+  }
+]);
 
 simonGame.factory('gameStateFactory', [
   function() {
     var state = {
       steps: [],
       hasStarted: false,
+      count: 0,
       restart: function() {
         this.hasStarted = true;
         this.steps = [];
+        this.count = 0;
         this.step();
       },
       step: function() {
@@ -43,6 +58,7 @@ simonGame.controller('game', [
     });
     $scope.$watch('game.steps', function(newVal, oldVal) {
       if(newVal.length > 0) {
+        $scope.game.count += 1;
         $scope.$broadcast('game:showSteps', newVal);
       }
     });
@@ -57,12 +73,12 @@ simonGame.directive('sgButtons', [
       template: '\
       <div class="iface" ng-class="{enabled: current == -1}">\
       <div class="iface-row">\
-        <div class="iface-btn green" ng-class="{active: current == 1}"></div>\
-        <div class="iface-btn red" ng-class="{active: current == 2}"></div>\
+        <sg-button class="iface-btn green" number="1" ng-class="{active: current == 1}"></sg-button>\
+        <sg-button class="iface-btn red" number="2" ng-class="{active: current == 2}"></sg-button>\
       </div>\
       <div class="iface-row">\
-        <div class="iface-btn yellow" ng-class="{active: current == 3}"></div>\
-        <div class="iface-btn blue" ng-class="{active: current == 4}"></div>\
+        <sg-button class="iface-btn yellow" number="3" ng-class="{active: current == 3}"></sg-button>\
+        <sg-button class="iface-btn blue" number="4" ng-class="{active: current == 4}"></sg-button>\
       </div>\
       </div>\
       ',
@@ -82,11 +98,12 @@ simonGame.directive('sgButtons', [
             }, 1000);
           return seq.promise;
         };
+        $scope.play_steps = [];
         $scope.current = -2;
         $scope.$on('game:showSteps', function(event, steps) {
           $scope.current = 0;
           $scope.steps = steps;
-          runSteps([].concat(steps)).then(function(res) {
+          runSteps([].concat(steps)).then(function() {
             $scope.current = -1;
             $scope.$emit('game:showStepsDone');
           }, null, function(curr) {
@@ -95,9 +112,26 @@ simonGame.directive('sgButtons', [
         });
       },
       link: function($scope, $el, attrs) {
-        var buttons = $el.find('.iface-btn'),
-          play_steps = [];
       }
     }
   }
 ]);
+
+simonGame.directive('sgButton', [
+  '$timeout',
+  function($timeout) {
+    return {
+      link: function($scope, $el, $attrs) {
+        $el.on('click', function(e) {
+          if($scope.current == -1) {
+            $scope.current = -2;
+            $scope.play_steps.push($attrs.number - 1);
+            console.log($scope.steps);
+            console.log($scope.play_steps);
+          }
+        });
+      }
+    };
+  }
+]);
+
