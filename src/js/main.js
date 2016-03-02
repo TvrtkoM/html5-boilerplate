@@ -61,6 +61,11 @@ simonGame.controller('game', [
         $scope.game.count += 1;
         $scope.$broadcast('game:showSteps', newVal);
       }
+    }, true);
+
+    $scope.$on('game:nextStep', function(event) {
+      console.log('next');
+      $scope.game.step();
     });
   }
 ]);
@@ -68,17 +73,18 @@ simonGame.controller('game', [
 simonGame.directive('sgButtons', [
   '$q',
   '$interval',
-  function($q, $interval) {
+  '$timeout',
+  function($q, $interval, $timeout) {
     return {
       template: '\
-      <div class="iface" ng-class="{enabled: current == -1}">\
+      <div class="iface" ng-class="{enabled: current == -2}">\
       <div class="iface-row">\
-        <sg-button class="iface-btn green" number="1" ng-class="{active: current == 1}"></sg-button>\
-        <sg-button class="iface-btn red" number="2" ng-class="{active: current == 2}"></sg-button>\
+        <sg-button class="iface-btn green" number="0" ng-class="{active: current == 0}"></sg-button>\
+        <sg-button class="iface-btn red" number="1" ng-class="{active: current == 1}"></sg-button>\
       </div>\
       <div class="iface-row">\
-        <sg-button class="iface-btn yellow" number="3" ng-class="{active: current == 3}"></sg-button>\
-        <sg-button class="iface-btn blue" number="4" ng-class="{active: current == 4}"></sg-button>\
+        <sg-button class="iface-btn yellow" number="2" ng-class="{active: current == 2}"></sg-button>\
+        <sg-button class="iface-btn blue" number="3" ng-class="{active: current == 3}"></sg-button>\
       </div>\
       </div>\
       ',
@@ -93,42 +99,47 @@ simonGame.directive('sgButtons', [
                 seq.resolve();
                 $interval.cancel(interval);
               } else {
-                seq.notify(steps.shift() + 1);
+                seq.notify(steps.shift());
               }
             }, 1000);
           return seq.promise;
         };
         $scope.play_steps = [];
         $scope.current = -2;
+
         $scope.$on('game:showSteps', function(event, steps) {
-          $scope.current = 0;
+          console.log('show steps');
+          $scope.current = -1;
           $scope.steps = steps;
           runSteps([].concat(steps)).then(function() {
-            $scope.current = -1;
-            $scope.$emit('game:showStepsDone');
+            $scope.current = -2;
           }, null, function(curr) {
             $scope.current = curr;
           });
         });
-      },
-      link: function($scope, $el, attrs) {
+        $scope.$on('button:push', function(event, step) {
+          $scope.current = step;
+          $scope.play_steps.push(step);
+          $timeout(function() {
+            if($scope.play_steps.toString() == $scope.steps.toString()) {
+              $scope.$emit('game:nextStep');
+            } else {
+              $scope.current = -2;
+            }
+          }, 1000);
+        });
       }
     }
   }
 ]);
 
 simonGame.directive('sgButton', [
-  '$timeout',
-  function($timeout) {
+  function() {
     return {
       link: function($scope, $el, $attrs) {
-        $el.on('click', function(e) {
-          if($scope.current == -1) {
-            $scope.current = -2;
-            $scope.play_steps.push($attrs.number - 1);
-            console.log($scope.steps);
-            console.log($scope.play_steps);
-          }
+        $el.bind('click', function() {
+          $scope.$emit('button:push', parseInt($attrs.number));
+          $scope.$apply();
         });
       }
     };
