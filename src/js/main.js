@@ -7,6 +7,9 @@ simonGame.filter('twoDigit', [
       if(input == 0) {
         return '--';
       }
+      else if (input == -1) {
+        return '!!';
+      }
       else if (input < 10) {
         return '0' + input.toString();
       }
@@ -21,6 +24,7 @@ simonGame.factory('gameStateFactory', [
       steps: [],
       hasStarted: false,
       count: 0,
+      strict: false,
       restart: function() {
         this.hasStarted = true;
         this.steps = [];
@@ -47,8 +51,9 @@ simonGame.factory('gameStateFactory', [
 
 simonGame.controller('game', [
   '$scope',
+  '$timeout',
   'gameStateFactory',
-  function($scope, gameStateFactory) {
+  function($scope, $timeout, gameStateFactory) {
     $scope.game = gameStateFactory.new();
 
     $scope.$watch('isOn', function(val) {
@@ -56,16 +61,27 @@ simonGame.controller('game', [
         $scope.game.off();
       }
     });
-    $scope.$watch('game.steps', function(newVal, oldVal) {
-      if(newVal.length > 0) {
+    $scope.$watchCollection('game.steps', function(steps) {
+      if(steps.length > 0) {
         $scope.game.count += 1;
-        $scope.$broadcast('game:showSteps', newVal);
+        $scope.$broadcast('game:showSteps', steps);
       }
-    }, true);
+    });
 
     $scope.$on('game:nextStep', function(event) {
-      console.log('next');
       $scope.game.step();
+    });
+
+    $scope.$on('game:invalidStep', function(event) {
+      $scope.game.count = -1;
+      $timeout(function() {
+        if($scope.game.strict) {
+          $scope.game.restart();
+        } else {
+          $scope.$broadcast('game:showSteps', $scope.game.steps);
+          $scope.game.count = $scope.game.steps.length;
+        }
+      }, 700);
     });
   }
 ]);
@@ -101,32 +117,56 @@ simonGame.directive('sgButtons', [
               } else {
                 seq.notify(steps.shift());
               }
-            }, 1000);
+            }, 1100);
           return seq.promise;
         };
-        $scope.play_steps = [];
-        $scope.current = -2;
-
-        $scope.$on('game:showSteps', function(event, steps) {
-          console.log('show steps');
-          $scope.current = -1;
-          $scope.steps = steps;
+        var showSteps = function(steps) {
           runSteps([].concat(steps)).then(function() {
             $scope.current = -2;
           }, null, function(curr) {
             $scope.current = curr;
+            $timeout(function() {
+              $scope.current = -1;
+            }, 950);
           });
+        };
+        var idle_timer;
+
+        $scope.current = -1;
+
+        $scope.$watch('current', function() {
+          if(!!idle_timer) {
+            $timeout.cancel(idle_timer);
+          }
+          idle_timer = $timeout(function() {
+            showSteps($scope.steps);
+            idle_timer = null;
+          }, 5000);
+        });
+
+        $scope.$on('game:showSteps', function(event, steps) {
+          $scope.play_steps = [];
+          $scope.current = -1;
+          $scope.steps = steps;
+          showSteps(steps);
         });
         $scope.$on('button:push', function(event, step) {
-          $scope.current = step;
-          $scope.play_steps.push(step);
-          $timeout(function() {
-            if($scope.play_steps.toString() == $scope.steps.toString()) {
-              $scope.$emit('game:nextStep');
-            } else {
-              $scope.current = -2;
+          var step_no;
+          if($scope.current == -2) {
+            $scope.current = step;
+            $scope.play_steps.push(step);
+            step_no = $scope.play_steps.length - 1;
+            if(step != $scope.steps[step_no]) {
+              $scope.$emit('game:invalidStep');
             }
-          }, 1000);
+            $timeout(function() {
+              if($scope.play_steps.toString() == $scope.steps.toString()) {
+                $scope.$emit('game:nextStep');
+              } else {
+                $scope.current = -2;
+              }
+            }, 1000);
+          }
         });
       }
     }
