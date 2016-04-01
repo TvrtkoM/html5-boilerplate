@@ -1,98 +1,119 @@
 var angular = require('angular');
 var simonGame = angular.module('simonGame', []);
 
-simonGame.filter('twoDigit', [
-  function() {
-    return function(input) {
-      if(input == 0) {
-        return '--';
-      }
-      else if (input == -1) {
-        return '!!';
-      }
-      else if (input < 10) {
-        return '0' + input.toString();
-      }
-      return input.toString();
-    }
-  }
-]);
+var AudioContext = window.AudioContext || window.webkitAudioContext || false;
+var oscillators_gains;
+var actx;
 
-simonGame.factory('gameStateFactory', [
-  function() {
-    var state = {
-      steps: [],
-      hasStarted: false,
-      count: 0,
-      strict: false,
-      restart: function() {
-        this.hasStarted = true;
-        this.steps = [];
-        this.count = 0;
-        this.step();
-      },
-      step: function() {
-        var next = Math.floor(Math.random() * 4);
-        this.steps.push(next);
-        return next;
-      },
-      off: function() {
-        this.steps = [];
-        this.hasStarted = false;
-      }
-    };
-    return {
-      new: function() {
-        return Object.create(state);
-      }
-    }
-  }
-]);
-
-simonGame.controller('game', [
-  '$scope',
-  '$timeout',
-  'gameStateFactory',
-  function($scope, $timeout, gameStateFactory) {
-    $scope.game = gameStateFactory.new();
-
-    $scope.$watch('isOn', function(val) {
-      if(!val) {
-        $scope.game.off();
-      }
-    });
-    $scope.$watchCollection('game.steps', function(steps) {
-      if(steps.length > 0) {
-        $scope.game.count += 1;
-        $scope.$broadcast('game:showSteps', steps);
-      }
-    });
-
-    $scope.$on('game:nextStep', function(event) {
-      $scope.game.step();
-    });
-
-    $scope.$on('game:invalidStep', function(event) {
-      $scope.game.count = -1;
-      $timeout(function() {
-        if($scope.game.strict) {
-          $scope.game.restart();
-        } else {
-          $scope.$broadcast('game:showSteps', $scope.game.steps);
-          $scope.game.count = $scope.game.steps.length;
+if (!AudioContext) {
+  alert('Sorry, but the Web Audio API is not supported by your browser.'
+    + ' Please, consider downloading the latest version of '
+    + 'Google Chrome or Mozilla Firefox');
+} else {
+  actx = new AudioContext();
+  oscillators_gains = [329.63, 261.63, 220, 164.81].map(function(freq) {
+    var osc = actx.createOscillator();
+    var g = actx.createGain();
+    osc.connect(g);
+    g.connect(actx.destination);
+    g.gain.value = 0;
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    osc.start(0.0);
+    return [osc, g];
+  });
+  simonGame.filter('twoDigit', [
+    function() {
+      return function(input) {
+        if(input == 0) {
+          return '--';
         }
-      }, 700);
-    });
-  }
-]);
+        else if (input == -1) {
+          return '!!';
+        }
+        else if (input < 10) {
+          return '0' + input.toString();
+        }
+        return input.toString();
+      }
+    }
+  ]);
 
-simonGame.directive('sgButtons', [
-  '$q',
-  '$interval',
-  '$timeout',
-  function($q, $interval, $timeout) {
-    return {
-      template: '\
+  simonGame.factory('gameStateFactory', [
+    function() {
+      var state = {
+        steps: [],
+        hasStarted: false,
+        count: 0,
+        strict: false,
+        restart: function() {
+          this.hasStarted = true;
+          this.steps = [];
+          this.count = 0;
+          this.step();
+        },
+        step: function() {
+          var next = Math.floor(Math.random() * 4);
+          this.steps.push(next);
+          return next;
+        },
+        off: function() {
+          this.steps = [];
+          this.hasStarted = false;
+        }
+      };
+      return {
+        new: function() {
+          return Object.create(state);
+        }
+      }
+    }
+  ]);
+
+  simonGame.controller('game', [
+    '$scope',
+    '$timeout',
+    'gameStateFactory',
+    function($scope, $timeout, gameStateFactory) {
+      $scope.game = gameStateFactory.new();
+
+      $scope.$watch('isOn', function(val) {
+        if(!val) {
+          $scope.game.off();
+        }
+      });
+      $scope.$watchCollection('game.steps', function(steps) {
+        if(steps.length > 0) {
+          $scope.game.count += 1;
+          $scope.$broadcast('game:showSteps', steps);
+        }
+      });
+
+      $scope.$on('game:nextStep', function(event) {
+        $scope.game.step();
+      });
+
+      $scope.$on('game:invalidStep', function(event) {
+        $scope.game.count = -1;
+        $timeout(function() {
+          if($scope.game.strict) {
+            $scope.game.restart();
+          } else {
+            $scope.$broadcast('game:showSteps', $scope.game.steps);
+            $scope.game.count = $scope.game.steps.length;
+          }
+        }, 700);
+      });
+    }
+  ]);
+
+  simonGame.directive('sgButtons', [
+    '$q',
+    '$interval',
+    '$timeout',
+    function($q, $interval, $timeout) {
+      return {
+        template: '\
       <div class="iface" ng-class="{enabled: current == -2}">\
       <div class="iface-row">\
         <sg-button class="iface-btn green" number="0" ng-class="{active: current == 0}"></sg-button>\
@@ -104,85 +125,95 @@ simonGame.directive('sgButtons', [
       </div>\
       </div>\
       ',
-      scope: {
-        steps: '=steps'
-      },
-      controller: function($scope) {
-        var runSteps = function(steps) {
-          var seq = $q.defer(),
-            interval = $interval(function() {
-              if(steps.length == 0) {
-                seq.resolve();
-                $interval.cancel(interval);
-              } else {
-                seq.notify(steps.shift());
-              }
-            }, 1100);
-          return seq.promise;
-        };
-        var showSteps = function(steps) {
-          runSteps([].concat(steps)).then(function() {
-            $scope.current = -2;
-          }, null, function(curr) {
-            $scope.current = curr;
-            $timeout(function() {
-              $scope.current = -1;
-            }, 950);
-          });
-        };
-        var idle_timer;
+        scope: {
+          steps: '=steps'
+        },
+        controller: function($scope) {
+          var idle_timer;
+          var runSteps = function(steps) {
+            var seq = $q.defer(),
+              interval = $interval(function() {
+                if(steps.length == 0) {
+                  seq.resolve();
+                  $interval.cancel(interval);
+                } else {
+                  seq.notify(steps.shift());
+                }
+              }, 1100);
+            return seq.promise;
+          };
+          var showSteps = function(steps) {
+            runSteps([].concat(steps)).then(function() {
+              $scope.current = -2;
+            }, null, function(curr) {
+              playTone(curr);
+              $scope.current = curr;
+              $timeout(function() {
+                $scope.current = -1;
+                stopTone(curr);
+              }, 950);
+            });
+          };
+          var playTone = function(num) {
+            oscillators_gains[num][1].gain.linearRampToValueAtTime(0.5, actx.currentTime + 0.1)
+          };
+          var stopTone = function(num) {
+            oscillators_gains[num][1].gain.linearRampToValueAtTime(0, actx.currentTime + 0.1)
+          };
 
-        $scope.current = -1;
-
-        $scope.$watch('current', function() {
-          if(!!idle_timer) {
-            $timeout.cancel(idle_timer);
-          }
-          idle_timer = $timeout(function() {
-            showSteps($scope.steps);
-            idle_timer = null;
-          }, 5000);
-        });
-
-        $scope.$on('game:showSteps', function(event, steps) {
-          $scope.play_steps = [];
           $scope.current = -1;
-          $scope.steps = steps;
-          showSteps(steps);
-        });
-        $scope.$on('button:push', function(event, step) {
-          var step_no;
-          if($scope.current == -2) {
-            $scope.current = step;
-            $scope.play_steps.push(step);
-            step_no = $scope.play_steps.length - 1;
-            if(step != $scope.steps[step_no]) {
-              $scope.$emit('game:invalidStep');
+
+          $scope.$watch('current', function() {
+            if(!!idle_timer) {
+              $timeout.cancel(idle_timer);
             }
-            $timeout(function() {
-              if($scope.play_steps.toString() == $scope.steps.toString()) {
-                $scope.$emit('game:nextStep');
-              } else {
-                $scope.current = -2;
+            idle_timer = $timeout(function() {
+              showSteps($scope.steps);
+              idle_timer = null;
+            }, 5000);
+          });
+
+          $scope.$on('game:showSteps', function(event, steps) {
+            $scope.play_steps = [];
+            $scope.current = -1;
+            $scope.steps = steps;
+            showSteps(steps);
+          });
+          $scope.$on('button:push', function(event, step) {
+            var step_no;
+            if($scope.current == -2) {
+              $scope.current = step;
+              playTone(step);
+              $scope.play_steps.push(step);
+              step_no = $scope.play_steps.length - 1;
+              if(step != $scope.steps[step_no]) {
+                $scope.$emit('game:invalidStep');
               }
-            }, 1000);
-          }
-        });
+              $timeout(function() {
+                stopTone(step);
+                if($scope.play_steps.toString() == $scope.steps.toString()) {
+                  $scope.$emit('game:nextStep');
+                } else {
+                  $scope.current = -2;
+                }
+              }, 1000);
+            }
+          });
+        }
       }
     }
-  }
-]);
+  ]);
 
-simonGame.directive('sgButton', [
-  function() {
-    return {
-      link: function($scope, $el, $attrs) {
-        $el.bind('click', function() {
-          $scope.$emit('button:push', parseInt($attrs.number));
-          $scope.$apply();
-        });
-      }
-    };
-  }
-]);
-
+  simonGame.directive('sgButton', [
+    function() {
+      return {
+        link: function($scope, $el, $attrs) {
+          $el.bind('click', function() {
+            $scope.$emit('button:push', parseInt($attrs.number));
+            $scope.$apply();
+          });
+        }
+      };
+    }
+  ]);
+}
